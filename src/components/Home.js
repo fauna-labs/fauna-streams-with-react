@@ -1,27 +1,65 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import faunaClient, { newTransaction, getTransactionRef } from "../db/operations";
+import { CompleteIcon, PendingIcon, RejectIcon, SubmitButtonIcon } from "./Icons";
 
 export default function Home() {
 
   const [state, setState] = useState({
     name: '',
-    amount: 0,
-    type: '',
+    subscription: 'individual',
+    card: '',
+    result: ''
   });
 
-  const handleChange = (e) => { 
+  const [subscribedTransaction, setSubscribedTransaction] = useState(null);
+
+  const handleChange = (e) => {
     setState({
       ...state,
       [e.target.name]: e.target.value
     });
   }
 
-  const createNewTransaction = (e) => {
+  useEffect(() => {
+    if(state.result) {
+      const newTransactionRef = getTransactionRef(state.result)
+      faunaClient.stream.document(newTransactionRef)
+      .on('snapshot', snapshot => { 
+        console.log('snapshot', snapshot);
+        setSubscribedTransaction(snapshot.data)
+      })
+      .on('version', version => {
+        console.log('version', version);
+        setSubscribedTransaction(version.document.data);
+      })
+      .start()
+    }
+  }, [state.result])
+
+  const createNewTransaction = async (e) => {
     e.preventDefault();
+    const response = await newTransaction({
+      ...state,
+      status: 'Pending'
+    });
+    setState({
+      ...state,
+      result: response.ref.value.id
+    })
+  }
 
-    console.log('createNewTransaction', state);
-
-    setState({name: ''});
-
+  const getStatusIcon = () => {
+    console.log('status',subscribedTransaction.status )
+    switch(subscribedTransaction.status) {
+      case 'Pending':
+        return <PendingIcon />
+      case 'Complete':
+        return <CompleteIcon />
+      case 'Rejected':
+        return <RejectIcon />
+      default:
+        return '';
+    }
   }
 
   return (
@@ -49,7 +87,7 @@ export default function Home() {
       <label className="font-medium text-gray-700">Select Tier</label>
       <div className="mt-1 mb-4">
         <select 
-          name="type" 
+          name="subscription"
           onChange={handleChange} 
           value={state.type}
           className="shadow-md focus:border-purple-500 min-w-500 rounded-md"
@@ -64,12 +102,29 @@ export default function Home() {
         className="inline-flex items-center px-4 py-2 border rounded-md text-white bg-indigo-600 focus:ring-4"
         onClick={createNewTransaction}
       >
-        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-          <path d="M4 4a2 2 0 00-2 2v1h16V6a2 2 0 00-2-2H4z" />
-          <path fillRule="evenodd" d="M18 9H2v5a2 2 0 002 2h12a2 2 0 002-2V9zM4 13a1 1 0 011-1h1a1 1 0 110 2H5a1 1 0 01-1-1zm5-1a1 1 0 100 2h1a1 1 0 100-2H9z" />
-        </svg>
+        <SubmitButtonIcon />
         Submit
       </button>
+      {
+        state.result && (
+          <div className="mt-4">
+            <h3 className="font-medium text-gray-700">Transaction ID</h3>
+            <textarea value={state.result} disabled className="mt-4"/>
+          </div>
+        )
+      }
+      {
+        subscribedTransaction && (
+          <div className="mt-4">
+            <h3 className="flex font-medium text-gray-700">
+              {getStatusIcon()}
+              <div className="ml-4 mt-1">
+                Transaction Status: {subscribedTransaction.status}
+              </div>
+            </h3>
+          </div>
+        )
+      }
     </div>
 
   );
