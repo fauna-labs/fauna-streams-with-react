@@ -6,7 +6,7 @@ export default function Home() {
 
   const [state, setState] = useState({
     name: '',
-    subscription: 'individual',
+    plan: 'individual',
     card: '',
     result: ''
   });
@@ -87,7 +87,7 @@ export default function Home() {
       <label className="font-medium text-gray-700">Select Tier</label>
       <div className="mt-1 mb-4">
         <select 
-          name="subscription"
+          name="plan"
           onChange={handleChange} 
           value={state.type}
           className="shadow-md focus:border-purple-500 min-w-500 rounded-md"

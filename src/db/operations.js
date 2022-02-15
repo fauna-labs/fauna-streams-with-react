@@ -1,7 +1,13 @@
 import faunadb, {
   Create,
   Collection,
-  Ref
+  Ref,
+  Documents,
+  Paginate,
+  Lambda,
+  Get,
+  Map,
+  Delete
 } from 'faunadb';
 
 const client = new faunadb.Client({
@@ -21,4 +27,19 @@ export const newTransaction = (data) => client.query(
 
 export default client;
 
-export const getTransactionRef = (id) => Ref(Collection('Transaction'), id)
+export const getTransactionRef = (id) => Ref(Collection('Transaction'), id);
+
+// Define the reference to the target set
+export const getSetRef = (collectionName) => Documents(Collection(collectionName));
+
+// All Transactions
+export const allTransactions = () => client.query(
+  Map(
+    Paginate(Documents(Collection('Transaction'))),
+    Lambda(x => Get(x))
+  )
+)
+
+export const deleteTransaction = id => client.query(
+  Delete(Ref(Collection('Transaction'), id))
+)
