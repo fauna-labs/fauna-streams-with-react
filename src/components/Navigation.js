@@ -24,9 +24,6 @@ export default function Navigation() {
             <li className={location.pathname === '/dashboard' ? selected : unselected}>
               <Link to="/dashboard">Admin Dashboard</Link>
             </li>
-            <li className={location.pathname === '/about' ? selected : unselected}>
-              <Link to="/about">Docs</Link>
-            </li>
           </div>
         </ul>
       </nav>

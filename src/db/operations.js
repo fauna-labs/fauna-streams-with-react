@@ -7,7 +7,8 @@ import faunadb, {
   Lambda,
   Get,
   Map,
-  Delete
+  Delete,
+  Update
 } from 'faunadb';
 
 const client = new faunadb.Client({
@@ -37,6 +38,17 @@ export const allTransactions = () => client.query(
   Map(
     Paginate(Documents(Collection('Transaction'))),
     Lambda(x => Get(x))
+  )
+)
+
+export const updateTransaction = (id, data) => client.query(
+  Update(
+    Ref(Collection('Transaction'), id),
+    {
+      data: {
+        ...data
+      },
+    },
   )
 )
 
