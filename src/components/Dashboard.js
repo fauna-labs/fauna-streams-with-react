@@ -22,7 +22,10 @@ export default function Dashboard() {
       }
       if(set.action === 'add') { 
         console.log('add', set.document);
-        setListTransaction([...listTransaction, {id: set.document.ref.value.id}]);
+        setListTransaction([...listTransaction, {
+          id: set.document.ref.value.id,
+          status: 'Pending',
+        }]);
       }
     })
 
@@ -44,7 +47,8 @@ export default function Dashboard() {
     const allTransaction = [];
     transactions.data.forEach(element => {
       allTransaction.push({
-        id: element.ref.id
+        id: element.ref.id,
+        ...element.data
       });
     });
     setListTransaction(allTransaction);
