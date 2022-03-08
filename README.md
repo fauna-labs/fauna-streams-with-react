@@ -10,13 +10,15 @@ REACT_APP_FAUNA_KEY='fnAxxxxx'
 
 Head over to [Fuana Dashboard](https://dashboard.fauna.com/) and create a new **Collection** called `Transaction`.
 
-Open `operations.js` file. Select the appropiate endpoint based on your database region group. For example, if your database region group is US choose `db.us.fauna.com`. Follow [this link](https://docs.fauna.com/fauna/current/learn/understanding/region_groups) for all regions groups.
+If you created your database in a region group other than `Global`, add the region group as an environment variable in your `.env` file. 
 
+```sh
+...
+REACT_APP_FAUNA_DOMAIN='db.us.fauna.com'
 ```
-const client = new faunadb.Client({
-  secret: process.env.REACT_APP_FAUNA_KEY,
-  domain: 'db.us.fauna.com', 
-});
+
+Follow [this link](https://docs.fauna.com/fauna/current/learn/understanding/region_groups) for all regions groups.
+
 ```
 
 Run the following command
