@@ -1,5 +1,9 @@
 ### Getting Started
 
+
+[Video walkthough](https://www.youtube.com/watch?v=t06LHlk0tE8&ab_channel=FaunaInc.)
+
+
 Clone the repository
 
 Create a new `.env.local` file and add your Fauna key as follows.
